@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Business {
+  id            String        @id @default(cuid())
+  name          String
+  slug          String        @unique
+  category      String
+  services      String
+  googlePlaceId String
+  createdAt     DateTime      @default(now())
+  events        ReviewEvent[]
+}
+
+model ReviewEvent {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  rating     Int
+  copied     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([businessId])
+}

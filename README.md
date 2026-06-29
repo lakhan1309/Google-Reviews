@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QR Review Assistant
 
-## Getting Started
+AI-powered Google review assistant. Customers scan a QR code at your business counter, pick a star rating, choose from AI-generated review options, and are redirected to Google to paste and submit.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Customer flow**: Star rating → 3 AI-generated reviews → copy → redirect to Google
+- **Admin dashboard**: Manage businesses, download QR codes, view analytics
+- **QR codes**: Auto-generated per business, ready to print
+- **PostgreSQL (Neon)**: Persistent storage for Vercel and production
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Prerequisites
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Node.js 20+
+- Neon PostgreSQL database ([neon.tech](https://neon.tech))
+- OpenAI API key (production)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Local setup
 
-## Learn More
+1. **Install dependencies**
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Configure environment**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   cp .env.example .env
+   ```
 
-## Deploy on Vercel
+   Fill in:
+   - `DATABASE_URL` — Neon connection string
+   - `OPENAI_API_KEY` — optional locally if `USE_MOCK_REVIEWS=true`
+   - `AUTH_SECRET` — run `openssl rand -base64 32`
+   - `ADMIN_EMAIL` / `ADMIN_PASSWORD` — admin login credentials
+   - `NEXT_PUBLIC_APP_URL` — `http://localhost:3000`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Run migrations and seed**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   npm run db:deploy
+   npm run db:seed
+   ```
+
+4. **Start development server**
+
+   ```bash
+   npm run dev
+   ```
+
+   - Home: http://localhost:3000
+   - Admin: http://localhost:3000/admin
+   - Sample review page: http://localhost:3000/r/joes-pizza
+
+## Deploy to Vercel
+
+1. **Push to GitHub**
+
+   ```bash
+   git add .
+   git commit -m "Prepare for Vercel deployment with Neon"
+   git push -u origin main
+   ```
+
+2. **Import project** at [vercel.com/new](https://vercel.com/new)
+
+3. **Add Neon database** — Vercel Dashboard → Storage → Create → Neon Postgres → link to project (sets `DATABASE_URL` automatically)
+
+4. **Set environment variables** in Vercel Project Settings:
+
+   | Variable | Value |
+   |----------|-------|
+   | `DATABASE_URL` | Auto-set by Neon integration |
+   | `OPENAI_API_KEY` | Your OpenAI API key |
+   | `AUTH_SECRET` | Random secret (`openssl rand -base64 32`) |
+   | `ADMIN_EMAIL` | Your admin email |
+   | `ADMIN_PASSWORD` | Strong password |
+   | `NEXT_PUBLIC_APP_URL` | `https://your-app.vercel.app` |
+
+   Do **not** set `USE_MOCK_REVIEWS` on Vercel (mock reviews are disabled in production automatically).
+
+5. **Deploy** — Vercel runs `npm run build` (includes `prisma generate`)
+
+6. **Run migrations** against your Neon database (one-time):
+
+   ```bash
+   DATABASE_URL="your-neon-url" npm run db:deploy
+   DATABASE_URL="your-neon-url" npm run db:seed
+   ```
+
+7. **Redeploy** after setting `NEXT_PUBLIC_APP_URL` to your live Vercel URL so QR codes point to production.
+
+## Google Place ID
+
+1. Open your business on [Google Maps](https://maps.google.com)
+2. Use the [Place ID Finder](https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder)
+3. Paste the Place ID when creating a business in the admin dashboard
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run db:migrate` | Create/apply migrations (dev) |
+| `npm run db:deploy` | Apply migrations (production) |
+| `npm run db:seed` | Seed sample business |
+| `npm run db:import` | Import businesses from `data/businesses.json` |

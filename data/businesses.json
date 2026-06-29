@@ -1,0 +1,11 @@
+[
+  {
+    "id": "sample-joes-pizza",
+    "name": "Joe's Pizza",
+    "slug": "joes-pizza",
+    "category": "restaurant",
+    "services": "Wood-fired pizzas, fresh pasta, craft beers, family-friendly dine-in, quick takeout, and weekend brunch specials.",
+    "googlePlaceId": "ChIJN1t_tDeuEmsRUsoyG83frY4",
+    "createdAt": "2025-06-29T00:00:00.000Z"
+  }
+]
