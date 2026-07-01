@@ -161,6 +161,3 @@ export async function generateReviews(
   return generateWithOpenAI(input);
 }
 
-export function getGoogleReviewUrl(googlePlaceId: string): string {
-  return `https://search.google.com/local/writereview?placeid=${encodeURIComponent(googlePlaceId)}`;
-}

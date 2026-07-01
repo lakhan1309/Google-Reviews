@@ -8,7 +8,7 @@ import { StarRating } from "@/components/StarRating";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getGoogleReviewUrl } from "@/lib/ai";
+import { getGoogleReviewUrl } from "@/lib/google-review-url";
 
 type ReviewFlowProps = {
   businessName: string;
@@ -77,7 +77,7 @@ export function ReviewFlow({ businessName, slug, googlePlaceId }: ReviewFlowProp
   }
 
   function handleGoToGoogle() {
-    window.location.href = getGoogleReviewUrl(googlePlaceId);
+    window.open(getGoogleReviewUrl(googlePlaceId), "_blank", "noopener,noreferrer");
   }
 
   return (

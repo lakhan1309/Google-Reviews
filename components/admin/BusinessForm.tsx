@@ -75,24 +75,29 @@ export function BusinessForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="googlePlaceId">Google Place ID</Label>
+            <Label htmlFor="googlePlaceId">Google Place ID or review link</Label>
             <Input
               id="googlePlaceId"
               name="googlePlaceId"
               required
               defaultValue={defaultValues?.googlePlaceId}
-              placeholder="ChIJ..."
+              placeholder="https://g.page/r/.../review or ChIJ..."
             />
             <p className="text-xs text-muted-foreground">
-              Find it on{" "}
+              Best: copy the link from Google Business Profile →{" "}
+              <span className="font-medium">Ask for reviews</span> (e.g.{" "}
+              <span className="font-mono">g.page/r/CUv_.../review</span>). You
+              can paste the full link, just the short code, or a{" "}
+              <span className="font-mono">ChIJ</span> Place ID from the{" "}
               <a
                 href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline"
               >
-                Google Place ID Finder
+                Place ID Finder
               </a>
+              .
             </p>
           </div>
 

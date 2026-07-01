@@ -11,12 +11,19 @@ import {
   updateBusiness as updateBusinessRecord,
 } from "@/lib/store";
 import { slugify } from "@/lib/slug";
+import {
+  GOOGLE_REVIEW_INPUT_ERROR,
+  isValidGoogleReviewInput,
+} from "@/lib/google-review-url";
 
 const businessSchema = z.object({
   name: z.string().min(1, "Name is required"),
   category: z.enum([...BUSINESS_CATEGORIES]),
   services: z.string().min(1, "Services description is required"),
-  googlePlaceId: z.string().min(1, "Google Place ID is required"),
+  googlePlaceId: z
+    .string()
+    .min(1, "Google Place ID or review link is required")
+    .refine(isValidGoogleReviewInput, GOOGLE_REVIEW_INPUT_ERROR),
 });
 
 async function ensureUniqueSlug(baseSlug: string, excludeId?: string) {
