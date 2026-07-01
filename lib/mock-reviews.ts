@@ -48,5 +48,9 @@ export function shouldUseMockReviews(): boolean {
   const isLocal =
     process.env.NEXT_PUBLIC_APP_URL?.includes("localhost") ?? false;
 
-  return isLocal && !process.env.OPENAI_API_KEY?.startsWith("sk-");
+  return (
+    isLocal &&
+    !process.env.GEMINI_API_KEY &&
+    !process.env.OPENAI_API_KEY?.startsWith("sk-")
+  );
 }

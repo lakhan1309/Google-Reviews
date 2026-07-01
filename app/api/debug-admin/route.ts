@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getLlmProvider } from "@/lib/ai";
 import { debugLog } from "@/lib/debug-log";
 import { prisma } from "@/lib/prisma";
 
@@ -9,6 +10,9 @@ export async function GET() {
     hasAdminEmail: !!process.env.ADMIN_EMAIL,
     hasAdminPassword: !!process.env.ADMIN_PASSWORD,
     hasAppUrl: !!process.env.NEXT_PUBLIC_APP_URL,
+    hasGeminiKey: !!process.env.GEMINI_API_KEY,
+    hasOpenAiKey: !!process.env.OPENAI_API_KEY,
+    llmProvider: getLlmProvider(),
     nodeEnv: process.env.NODE_ENV,
     databaseHost: process.env.DATABASE_URL?.includes("@")
       ? process.env.DATABASE_URL.split("@")[1]?.split("/")[0] ?? null

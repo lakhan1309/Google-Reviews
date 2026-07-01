@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { generateReviews } from "@/lib/ai";
+import { generateReviews, hasLlmConfigured } from "@/lib/ai";
 import { generateMockReviews, shouldUseMockReviews } from "@/lib/mock-reviews";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { createReviewEvent, getBusinessBySlug } from "@/lib/store";
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     const useMock = shouldUseMockReviews();
 
-    if (!useMock && !process.env.OPENAI_API_KEY) {
+    if (!useMock && !hasLlmConfigured()) {
       return NextResponse.json(
         { error: "Review generation is not configured" },
         { status: 503 }
