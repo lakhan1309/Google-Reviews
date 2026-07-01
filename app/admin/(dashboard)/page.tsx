@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { DbErrorPanel } from "@/components/admin/DbErrorPanel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,11 +13,44 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { listBusinessesWithEvents } from "@/lib/store";
+import { debugLog } from "@/lib/debug-log";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  const businesses = await listBusinessesWithEvents();
+  let businesses;
+
+  try {
+    businesses = await listBusinessesWithEvents();
+    // #region agent log
+    debugLog(
+      "app/admin/(dashboard)/page.tsx",
+      "Dashboard loaded",
+      { businessCount: businesses.length },
+      "A-D"
+    );
+    // #endregion
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    // #region agent log
+    debugLog(
+      "app/admin/(dashboard)/page.tsx",
+      "Dashboard DB error",
+      { error: message },
+      "A-D"
+    );
+    // #endregion
+    console.error("Admin dashboard DB error:", error);
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">Manage businesses and track review assistant usage</p>
+        </div>
+        <DbErrorPanel />
+      </div>
+    );
+  }
 
   const totalScans = businesses.reduce((sum, b) => sum + b.events.length, 0);
   const totalCopied = businesses.reduce(

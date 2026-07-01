@@ -48,3 +48,6 @@ next-env.d.ts
 
 # legacy local file storage (optional import source)
 data/events.json
+
+# cursor debug
+.cursor/
