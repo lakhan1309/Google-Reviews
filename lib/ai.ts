@@ -122,7 +122,7 @@ async function generateWithGemini(input: GenerateReviewsInput): Promise<string[]
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL ?? "gemini-1.5-flash",
+    model: process.env.GEMINI_MODEL ?? "gemini-3.5-flash",
     generationConfig: {
       responseMimeType: "application/json",
       temperature: 0.8,
