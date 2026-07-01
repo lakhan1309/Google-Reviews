@@ -50,7 +50,26 @@ export function shouldUseMockReviews(): boolean {
 
   return (
     isLocal &&
-    !process.env.GEMINI_API_KEY &&
-    !process.env.OPENAI_API_KEY?.startsWith("sk-")
+    !isValidGeminiKey(process.env.GEMINI_API_KEY) &&
+    !isValidOpenAiKey(process.env.OPENAI_API_KEY)
+  );
+}
+
+function isValidOpenAiKey(key?: string): boolean {
+  return (
+    !!key &&
+    key.startsWith("sk-") &&
+    key !== "sk-..." &&
+    !key.includes("your-") &&
+    key.length > 20
+  );
+}
+
+function isValidGeminiKey(key?: string): boolean {
+  return (
+    !!key &&
+    key.startsWith("AIza") &&
+    !key.includes("your-gemini") &&
+    key.length > 20
   );
 }

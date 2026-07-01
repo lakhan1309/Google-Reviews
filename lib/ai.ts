@@ -15,6 +15,25 @@ type GenerateReviewsInput = {
   rating: number;
 };
 
+function isValidOpenAiKey(key?: string): key is string {
+  return (
+    !!key &&
+    key.startsWith("sk-") &&
+    key !== "sk-..." &&
+    !key.includes("your-") &&
+    key.length > 20
+  );
+}
+
+function isValidGeminiKey(key?: string): key is string {
+  return (
+    !!key &&
+    key.startsWith("AIza") &&
+    !key.includes("your-gemini") &&
+    key.length > 20
+  );
+}
+
 function buildPrompt(input: GenerateReviewsInput): string {
   return `Business: ${input.name}
 Category: ${input.category}
@@ -29,20 +48,22 @@ Return JSON: { "reviews": ["...", "...", "..."] }`;
 
 export function getLlmProvider(): LlmProvider | null {
   const configured = process.env.LLM_PROVIDER?.toLowerCase();
+  const hasGemini = isValidGeminiKey(process.env.GEMINI_API_KEY);
+  const hasOpenAi = isValidOpenAiKey(process.env.OPENAI_API_KEY);
 
   if (configured === "gemini") {
-    return process.env.GEMINI_API_KEY ? "gemini" : null;
+    return hasGemini ? "gemini" : null;
   }
 
   if (configured === "openai") {
-    return process.env.OPENAI_API_KEY ? "openai" : null;
+    return hasOpenAi ? "openai" : null;
   }
 
-  if (process.env.GEMINI_API_KEY) {
+  if (hasGemini) {
     return "gemini";
   }
 
-  if (process.env.OPENAI_API_KEY) {
+  if (hasOpenAi) {
     return "openai";
   }
 
@@ -54,13 +75,16 @@ export function hasLlmConfigured(): boolean {
 }
 
 function parseReviews(content: string): string[] {
-  const parsed = reviewsSchema.parse(JSON.parse(content));
+  const trimmed = content.trim();
+  const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const jsonText = (fenced?.[1] ?? trimmed).trim();
+  const parsed = reviewsSchema.parse(JSON.parse(jsonText));
   return parsed.reviews;
 }
 
 async function generateWithOpenAI(input: GenerateReviewsInput): Promise<string[]> {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
+  if (!isValidOpenAiKey(apiKey)) {
     throw new Error("OPENAI_API_KEY is not configured");
   }
 
@@ -91,13 +115,13 @@ async function generateWithOpenAI(input: GenerateReviewsInput): Promise<string[]
 
 async function generateWithGemini(input: GenerateReviewsInput): Promise<string[]> {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  if (!isValidGeminiKey(apiKey)) {
     throw new Error("GEMINI_API_KEY is not configured");
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL ?? "gemini-2.0-flash",
+    model: process.env.GEMINI_MODEL ?? "gemini-1.5-flash",
     generationConfig: {
       responseMimeType: "application/json",
       temperature: 0.8,
@@ -124,7 +148,9 @@ export async function generateReviews(
   const provider = getLlmProvider();
 
   if (!provider) {
-    throw new Error("No LLM provider configured. Set GEMINI_API_KEY or OPENAI_API_KEY.");
+    throw new Error(
+      "No LLM provider configured. Set a valid GEMINI_API_KEY or OPENAI_API_KEY."
+    );
   }
 
   if (provider === "gemini") {

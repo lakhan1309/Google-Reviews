@@ -61,8 +61,12 @@ export async function POST(request: NextRequest) {
     }
 
     console.error("generate-reviews error:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to generate reviews. Please try again." },
+      {
+        error: "Failed to generate reviews. Please try again.",
+        reason: message,
+      },
       { status: 500 }
     );
   }

@@ -12,6 +12,15 @@ export async function GET() {
     hasAppUrl: !!process.env.NEXT_PUBLIC_APP_URL,
     hasGeminiKey: !!process.env.GEMINI_API_KEY,
     hasOpenAiKey: !!process.env.OPENAI_API_KEY,
+    geminiKeyValid: !!(
+      process.env.GEMINI_API_KEY?.startsWith("AIza") &&
+      process.env.GEMINI_API_KEY.length > 20
+    ),
+    openAiKeyValid: !!(
+      process.env.OPENAI_API_KEY?.startsWith("sk-") &&
+      process.env.OPENAI_API_KEY !== "sk-..." &&
+      process.env.OPENAI_API_KEY.length > 20
+    ),
     llmProvider: getLlmProvider(),
     nodeEnv: process.env.NODE_ENV,
     databaseHost: process.env.DATABASE_URL?.includes("@")
