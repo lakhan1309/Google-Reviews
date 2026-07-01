@@ -68,8 +68,9 @@ function isValidOpenAiKey(key?: string): boolean {
 function isValidGeminiKey(key?: string): boolean {
   return (
     !!key &&
-    key.startsWith("AIza") &&
+    (key.startsWith("AIza") || key.startsWith("AQ.")) &&
     !key.includes("your-gemini") &&
+    !key.includes("your-") &&
     key.length > 20
   );
 }

@@ -28,8 +28,9 @@ function isValidOpenAiKey(key?: string): key is string {
 function isValidGeminiKey(key?: string): key is string {
   return (
     !!key &&
-    key.startsWith("AIza") &&
+    (key.startsWith("AIza") || key.startsWith("AQ.")) &&
     !key.includes("your-gemini") &&
+    !key.includes("your-") &&
     key.length > 20
   );
 }

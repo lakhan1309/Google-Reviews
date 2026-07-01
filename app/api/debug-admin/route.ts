@@ -13,7 +13,10 @@ export async function GET() {
     hasGeminiKey: !!process.env.GEMINI_API_KEY,
     hasOpenAiKey: !!process.env.OPENAI_API_KEY,
     geminiKeyValid: !!(
-      process.env.GEMINI_API_KEY?.startsWith("AIza") &&
+      process.env.GEMINI_API_KEY &&
+      (process.env.GEMINI_API_KEY.startsWith("AIza") ||
+        process.env.GEMINI_API_KEY.startsWith("AQ.")) &&
+      !process.env.GEMINI_API_KEY.includes("your-gemini") &&
       process.env.GEMINI_API_KEY.length > 20
     ),
     openAiKeyValid: !!(
